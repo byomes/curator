@@ -1,4 +1,5 @@
 'use client';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
@@ -23,7 +24,7 @@ export function Nav({ name }: { name: string }) {
     <header className="border-b border-gray-800 sticky top-0 bg-[#0f1117]/95 backdrop-blur z-10">
       <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-1">
-          <span className="text-lg mr-2">📚</span>
+          <Image src="/icon.png" alt="Curator" width={24} height={24} className="rounded-md mr-2" />
           {LINKS.map((link) => {
             const active = link.href === '/' ? pathname === '/' : pathname.startsWith(link.href);
             return (

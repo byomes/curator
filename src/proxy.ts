@@ -27,5 +27,8 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+  // icon.png / apple-icon.png are Next.js's App Router icon-convention routes —
+  // they must stay publicly fetchable (no session cookie) or Safari's home-screen
+  // icon fetch gets redirected to the login page HTML instead of image bytes.
+  matcher: ['/((?!_next/static|_next/image|favicon\\.ico|icon\\.png|apple-icon\\.png).*)'],
 };
