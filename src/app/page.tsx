@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { Book, SPICE_SCALE } from '@/lib/types';
 
@@ -132,7 +133,7 @@ export default function LibraryPage() {
         <div className="bg-red-900/20 border border-red-800 rounded-xl p-4 text-red-300 text-sm">{error}</div>
       ) : books.length === 0 ? (
         <div className="text-center py-20">
-          <div className="text-5xl mb-4">📚</div>
+          <Image src="/icon.png" alt="Curator" width={64} height={64} className="rounded-xl mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-gray-200 mb-2">No books yet</h2>
           <p className="text-gray-500 mb-6">Add one, or send Watson a screenshot or link.</p>
           <Link href="/add" className="inline-block bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-xl font-medium transition-colors text-base">

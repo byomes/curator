@@ -1,5 +1,6 @@
 'use client';
 import { useState, Suspense } from 'react';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 function LoginForm() {
@@ -38,7 +39,7 @@ function LoginForm() {
   return (
     <div className="max-w-sm mx-auto px-4 py-16">
       <div className="text-center mb-8">
-        <div className="text-4xl mb-3">📚</div>
+        <Image src="/icon.png" alt="Curator" width={56} height={56} className="rounded-xl mx-auto mb-3" />
         <h1 className="text-xl font-semibold text-gray-100">Curator</h1>
         <p className="text-sm text-gray-500 mt-1">Sign in to browse and track</p>
       </div>
