@@ -16,6 +16,13 @@ const SHELF_LABELS: Record<Shelf, string> = {
   read: 'Read',
 };
 
+function seriesLine(book: BookDetail): string | null {
+  if (!book.series) return null;
+  if (book.series_number && book.series_total) return `${book.series} — Book ${book.series_number} of ${book.series_total}`;
+  if (book.series_number) return `${book.series} — Book ${book.series_number}`;
+  return book.series;
+}
+
 export default function BookDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [book, setBook] = useState<BookDetail | null>(null);
@@ -25,6 +32,7 @@ export default function BookDetailPage({ params }: { params: Promise<{ id: strin
   const [saving, setSaving] = useState(false);
   const [notes, setNotes] = useState('');
   const [rating, setRating] = useState<number | ''>('');
+  const [showSpiceDetail, setShowSpiceDetail] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -88,22 +96,38 @@ export default function BookDetailPage({ params }: { params: Promise<{ id: strin
     return <div className="max-w-2xl mx-auto px-4 py-12 text-center text-gray-500">Book not found.</div>;
   }
 
+  const spiceLabel = book.spice_rating !== null ? `${book.spice_rating} · ${SPICE_SCALE[book.spice_rating]}` : 'Unrated';
+  const series = seriesLine(book);
+
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-gray-100">{book.title}</h1>
-        <p className="text-gray-400">{book.author}</p>
-        {book.series && (
-          <p className="text-sm text-gray-600 mt-1">
-            {book.series}{book.series_number ? ` #${book.series_number}` : ''}
-          </p>
+      <div className="flex gap-4">
+        {book.cover_image_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={book.cover_image_url}
+            alt={book.title}
+            className="w-28 h-40 object-cover rounded-lg bg-gray-900 shrink-0"
+          />
+        ) : (
+          <div className="w-28 h-40 rounded-lg bg-gray-900 border border-gray-800 shrink-0 flex items-center justify-center text-gray-700 text-xs text-center px-2">
+            no cover found
+          </div>
         )}
+        <div className="min-w-0">
+          <h1 className="text-2xl font-semibold text-gray-100">{book.title}</h1>
+          <p className="text-gray-400">{book.author}</p>
+          {series && <p className="text-sm text-gray-600 mt-1">{series}</p>}
+        </div>
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-xs px-2.5 py-1 rounded-full bg-gray-800 text-gray-300 font-medium">
-          {book.spice_rating !== null ? `${book.spice_rating} · ${SPICE_SCALE[book.spice_rating]}` : 'Unrated'}
-        </span>
+        <button
+          onClick={() => setShowSpiceDetail((v) => !v)}
+          className="text-xs px-2.5 py-1 rounded-full bg-gray-800 text-gray-300 font-medium hover:bg-gray-700 transition-colors"
+        >
+          {spiceLabel} {book.spice_summary && (showSpiceDetail ? '▲' : '▼')}
+        </button>
         {book.kindle_unlimited && (
           <span className="text-xs px-2.5 py-1 rounded-full bg-blue-900/50 text-blue-400 font-medium">Kindle Unlimited</span>
         )}
@@ -113,11 +137,18 @@ export default function BookDetailPage({ params }: { params: Promise<{ id: strin
         <span className="text-xs px-2.5 py-1 rounded-full bg-gray-800 text-gray-500">{book.status}</span>
       </div>
 
-      {book.spice_notes && (
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-          <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Content Notes</h2>
-          <p className="text-sm text-gray-300">{book.spice_notes}</p>
+      {showSpiceDetail && (book.spice_summary || book.spice_notes) && (
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 space-y-2">
+          <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Content Notes</h2>
+          {book.spice_summary && <p className="text-sm text-gray-300">{book.spice_summary}</p>}
+          {book.spice_notes && book.spice_notes !== book.spice_summary && (
+            <p className="text-sm text-gray-500">{book.spice_notes}</p>
+          )}
         </div>
+      )}
+
+      {book.description && (
+        <p className="text-sm text-gray-400 leading-relaxed">{book.description}</p>
       )}
 
       <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 space-y-3">

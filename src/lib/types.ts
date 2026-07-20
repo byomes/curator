@@ -24,14 +24,20 @@ export interface Book {
   author: string;
   series: string | null;
   series_number: number | null;
+  series_total: number | null;
   page_count: number | null;
   spice_rating: number | null;
   spice_notes: string | null;
+  spice_summary: string | null;
+  cover_image_url: string | null;
+  description: string | null;
   kindle_unlimited: boolean;
   kindle_unlimited_checked_at: string | null;
   status: BookStatus;
   added_by: number | null;
   created_at: string;
+  batch_id: number | null;
+  batch_total: number | null;
 }
 
 export interface BookSource {
@@ -73,4 +79,14 @@ export interface Stats {
 export interface Session {
   userId: number;
   name: string;
+}
+
+export type JobStatus = "queued" | "running" | "done" | "failed";
+
+export interface IngestJobStatus {
+  job_id: number;
+  status: JobStatus;
+  error_message: string | null;
+  batch_id: number | null;
+  book: Book | null;
 }

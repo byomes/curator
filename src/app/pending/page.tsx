@@ -102,6 +102,9 @@ function PendingCard({ book, onChange }: { book: Book; onChange: () => void }) {
               {book.status === 'needs_review' ? 'Needs Review' : 'Pending'}
             </span>
           </div>
+          {book.batch_id && book.batch_total && book.batch_total > 1 && (
+            <p className="text-xs text-gray-600">part of a batch of {book.batch_total} submitted today</p>
+          )}
           {book.spice_notes && <p className="text-sm text-gray-400">{book.spice_notes}</p>}
           <div className="flex gap-2 pt-1">
             <button
