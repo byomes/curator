@@ -81,8 +81,17 @@ function ResearchResultCard({ book, onDone }: { book: Book; onDone: () => void }
         </div>
       </div>
 
-      {book.spice_summary && <p className="text-sm text-gray-400">{book.spice_summary}</p>}
       {book.description && <p className="text-sm text-gray-500">{book.description}</p>}
+
+      {book.findings && book.findings.length > 0 && (
+        <div className="space-y-2 pt-1">
+          {book.findings.map((f) => (
+            <p key={f.id} className="text-sm text-gray-400 border-l-2 border-gray-700 pl-3">
+              <span className="font-medium text-gray-300">{f.source_name}:</span> &ldquo;{f.excerpt}&rdquo;
+            </p>
+          ))}
+        </div>
+      )}
 
       {editing ? (
         <div className="space-y-2 pt-2 border-t border-gray-800">

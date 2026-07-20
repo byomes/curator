@@ -18,6 +18,26 @@ export const SPICE_SCALE: Record<number, string> = {
   5: "Explicit",
 };
 
+export type SpiceSourceType =
+  | "pluggedin"
+  | "booktriggerwarnings"
+  | "commonsensemedia"
+  | "clean_romance_blog"
+  | "goodreads_reader"
+  | "reddit";
+
+// A verbatim, attributed excerpt from a trusted content-rating source — never
+// a Watson-authored summary. Displayed as "Source Name: excerpt", quoted.
+export interface SpiceFinding {
+  id: number;
+  book_id: number;
+  source_name: string;
+  source_type: SpiceSourceType;
+  rank: number;
+  excerpt: string;
+  url: string | null;
+}
+
 export interface Book {
   id: number;
   title: string;
@@ -28,7 +48,6 @@ export interface Book {
   page_count: number | null;
   spice_rating: number | null;
   spice_notes: string | null;
-  spice_summary: string | null;
   cover_image_url: string | null;
   description: string | null;
   kindle_unlimited: boolean;
@@ -38,6 +57,9 @@ export interface Book {
   created_at: string;
   batch_id: number | null;
   batch_total: number | null;
+  // Present on book-detail and ingest-status responses; absent from the plain
+  // library list (which only needs the spice_rating badge, not full findings).
+  findings?: SpiceFinding[];
 }
 
 export interface BookSource {
@@ -51,6 +73,7 @@ export interface BookSource {
 
 export interface BookDetail extends Book {
   sources: BookSource[];
+  findings: SpiceFinding[];
 }
 
 export interface ReadingStatusEntry {

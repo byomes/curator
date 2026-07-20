@@ -126,7 +126,7 @@ export default function BookDetailPage({ params }: { params: Promise<{ id: strin
           onClick={() => setShowSpiceDetail((v) => !v)}
           className="text-xs px-2.5 py-1 rounded-full bg-gray-800 text-gray-300 font-medium hover:bg-gray-700 transition-colors"
         >
-          {spiceLabel} {book.spice_summary && (showSpiceDetail ? '▲' : '▼')}
+          {spiceLabel} {book.findings.length > 0 && (showSpiceDetail ? '▲' : '▼')}
         </button>
         {book.kindle_unlimited && (
           <span className="text-xs px-2.5 py-1 rounded-full bg-blue-900/50 text-blue-400 font-medium">Kindle Unlimited</span>
@@ -137,13 +137,29 @@ export default function BookDetailPage({ params }: { params: Promise<{ id: strin
         <span className="text-xs px-2.5 py-1 rounded-full bg-gray-800 text-gray-500">{book.status}</span>
       </div>
 
-      {showSpiceDetail && (book.spice_summary || book.spice_notes) && (
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 space-y-2">
-          <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Content Notes</h2>
-          {book.spice_summary && <p className="text-sm text-gray-300">{book.spice_summary}</p>}
-          {book.spice_notes && book.spice_notes !== book.spice_summary && (
-            <p className="text-sm text-gray-500">{book.spice_notes}</p>
-          )}
+      {showSpiceDetail && book.findings.length > 0 && (
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 space-y-3">
+          <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            What {book.findings.length} trusted source{book.findings.length !== 1 ? 's' : ''} said
+          </h2>
+          <div className="space-y-3">
+            {book.findings.map((f) => (
+              <div key={f.id} className="text-sm border-l-2 border-gray-700 pl-3">
+                <p className="text-gray-300">
+                  <span className="font-medium text-gray-200">{f.source_name}:</span> &ldquo;{f.excerpt}&rdquo;
+                </p>
+                {f.url && (
+                  <a href={f.url} target="_blank" rel="noreferrer" className="text-xs text-blue-400 hover:underline">
+                    View source →
+                  </a>
+                )}
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-gray-600">
+            These are the sources&rsquo; own words, quoted directly — not Watson&rsquo;s summary. The spice
+            rating above is Watson&rsquo;s judgment call after weighing them.
+          </p>
         </div>
       )}
 
