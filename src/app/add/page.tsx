@@ -19,7 +19,7 @@ export default function AddPage() {
   const [link, setLink] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [result, setResult] = useState<{ status: string; reason?: string } | null>(null);
+  const [result, setResult] = useState<{ status: string; message?: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -191,11 +191,7 @@ export default function AddPage() {
 
         {result && (
           <div className="bg-blue-900/20 border border-blue-800 rounded-xl p-3 text-blue-300 text-sm space-y-2">
-            <p>
-              {result.status === 'needs_review'
-                ? 'Added to Pending — Watson couldn’t confidently rate this one, so it needs your review.'
-                : 'Added to Pending — check it over and approve.'}
-            </p>
+            <p>Submitted — Watson&rsquo;s researching this one, you&rsquo;ll see it in Pending shortly.</p>
             <button
               type="button"
               onClick={() => router.push('/pending')}
@@ -211,7 +207,7 @@ export default function AddPage() {
           disabled={submitting}
           className="w-full bg-blue-600 hover:bg-blue-500 active:bg-blue-700 disabled:opacity-50 text-white text-center px-6 py-3.5 rounded-xl font-semibold transition-colors text-base"
         >
-          {submitting ? 'Researching…' : 'Submit'}
+          {submitting ? 'Submitting…' : 'Submit'}
         </button>
       </form>
     </div>

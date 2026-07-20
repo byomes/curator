@@ -2,9 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { watsonFetch } from '@/lib/watson';
 import { getSession, SESSION_COOKIE } from '@/lib/auth';
 
-// Research pass (Serper + Ollama synthesis) can take 15-40s — extend past the
-// platform's default function timeout.
-export const maxDuration = 60;
+// The Watson backend now responds in ~1-2s (research runs in a background thread
+// on the Beelink, not on this request) — this route no longer needs to hold the
+// connection open for the 15-40s research pass. A prior version set maxDuration=60
+// to cover that wait, but this project is on Vercel's Hobby plan, which hard-caps
+// functions at 10s regardless of maxDuration — that's what caused the timeout this
+// was meant to fix. Keeping a small buffer for Tailscale Funnel network latency.
+export const maxDuration = 10;
 
 export async function POST(request: NextRequest) {
   const session = await getSession(request.cookies.get(SESSION_COOKIE)?.value);
