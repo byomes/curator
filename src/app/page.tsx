@@ -2,7 +2,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Book, SPICE_SCALE } from '@/lib/types';
+import { Book } from '@/lib/types';
 
 function Spinner() {
   return (
@@ -12,23 +12,10 @@ function Spinner() {
   );
 }
 
-function SpiceBadge({ rating }: { rating: number | null }) {
-  if (rating === null) {
-    return (
-      <span className="text-xs px-2 py-0.5 rounded-full bg-gray-800 text-gray-500">unrated</span>
-    );
-  }
-  const colors = [
-    'bg-green-900/50 text-green-400',
-    'bg-green-900/50 text-green-400',
-    'bg-yellow-900/50 text-yellow-400',
-    'bg-orange-900/50 text-orange-400',
-    'bg-red-900/50 text-red-400',
-    'bg-red-900/50 text-red-400',
-  ];
+function SourcesBadge({ count }: { count: number }) {
   return (
-    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${colors[rating]}`}>
-      {rating} · {SPICE_SCALE[rating]}
+    <span className="text-xs px-2 py-0.5 rounded-full bg-gray-800 text-gray-400">
+      {count > 0 ? `${count} source${count !== 1 ? 's' : ''} found` : 'No sources found'}
     </span>
   );
 }
@@ -69,7 +56,7 @@ function BookCard({ book, onDelete }: { book: Book; onDelete: (book: Book) => vo
         )}
       </div>
       <div className="mt-3 flex items-center gap-2">
-        <SpiceBadge rating={book.spice_rating} />
+        <SourcesBadge count={book.findings?.length ?? 0} />
         {book.page_count && <span className="text-xs text-gray-600">{book.page_count}p</span>}
       </div>
     </Link>

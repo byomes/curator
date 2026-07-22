@@ -1,6 +1,6 @@
 'use client';
 import { use, useEffect, useState } from 'react';
-import { BookDetail, ReadingStatusEntry, Session, SPICE_SCALE, Shelf } from '@/lib/types';
+import { BookDetail, ReadingStatusEntry, Session, Shelf } from '@/lib/types';
 
 function Spinner() {
   return (
@@ -96,7 +96,9 @@ export default function BookDetailPage({ params }: { params: Promise<{ id: strin
     return <div className="max-w-2xl mx-auto px-4 py-12 text-center text-gray-500">Book not found.</div>;
   }
 
-  const spiceLabel = book.spice_rating !== null ? `${book.spice_rating} · ${SPICE_SCALE[book.spice_rating]}` : 'Unrated';
+  const spiceLabel = book.findings.length > 0
+    ? `${book.findings.length} source${book.findings.length !== 1 ? 's' : ''} found`
+    : 'No sources found';
   const series = seriesLine(book);
 
   return (

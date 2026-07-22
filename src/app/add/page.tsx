@@ -71,7 +71,9 @@ function ResearchResultCard({ book, onDone }: { book: Book; onDone: () => void }
           )}
           <div className="flex flex-wrap items-center gap-1.5 mt-2">
             <span className="text-xs px-2 py-0.5 rounded-full bg-gray-800 text-gray-300">
-              {book.spice_rating !== null ? `${book.spice_rating} · ${SPICE_SCALE[book.spice_rating]}` : 'Unrated'}
+              {book.findings && book.findings.length > 0
+                ? `${book.findings.length} source${book.findings.length !== 1 ? 's' : ''} found`
+                : 'No sources found'}
             </span>
             {book.kindle_unlimited && (
               <span className="text-xs px-2 py-0.5 rounded-full bg-blue-900/50 text-blue-400 font-medium">KU</span>

@@ -57,8 +57,10 @@ export interface Book {
   created_at: string;
   batch_id: number | null;
   batch_total: number | null;
-  // Present on book-detail and ingest-status responses; absent from the plain
-  // library list (which only needs the spice_rating badge, not full findings).
+  // Present everywhere as of 2026-07-22 — list_books() (the /api/books GET
+  // route) now attaches findings to every book, not just detail/ingest-status
+  // responses, so cards can show real source excerpts instead of a computed
+  // rating. Still optional here for defensiveness against older cached data.
   findings?: SpiceFinding[];
 }
 

@@ -94,7 +94,9 @@ function PendingCard({ book, onChange }: { book: Book; onChange: () => void }) {
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs px-2 py-0.5 rounded-full bg-gray-800 text-gray-300">
-              {book.spice_rating !== null ? `${book.spice_rating} · ${SPICE_SCALE[book.spice_rating]}` : 'Unrated'}
+              {book.findings && book.findings.length > 0
+                ? `${book.findings.length} source${book.findings.length !== 1 ? 's' : ''} found`
+                : 'No sources found'}
             </span>
             <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
               book.status === 'needs_review' ? 'bg-yellow-900/50 text-yellow-400' : 'bg-gray-800 text-gray-400'
@@ -105,7 +107,15 @@ function PendingCard({ book, onChange }: { book: Book; onChange: () => void }) {
           {book.batch_id && book.batch_total && book.batch_total > 1 && (
             <p className="text-xs text-gray-600">part of a batch of {book.batch_total} submitted today</p>
           )}
-          {book.spice_notes && <p className="text-sm text-gray-400">{book.spice_notes}</p>}
+          {book.findings && book.findings.length > 0 && (
+            <div className="space-y-2">
+              {book.findings.map((f) => (
+                <p key={f.id} className="text-sm text-gray-400 border-l-2 border-gray-700 pl-3">
+                  <span className="font-medium text-gray-300">{f.source_name}:</span> &ldquo;{f.excerpt}&rdquo;
+                </p>
+              ))}
+            </div>
+          )}
           <div className="flex gap-2 pt-1">
             <button
               disabled={busy}
