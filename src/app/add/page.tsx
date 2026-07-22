@@ -14,6 +14,28 @@ const TABS: { mode: Mode; label: string }[] = [
 
 const POLL_MS = 2500;
 
+function KUBadge({ status }: { status: boolean | null }) {
+  if (status === true) {
+    return (
+      <span className="text-xs px-2 py-0.5 rounded-full bg-blue-900/50 text-blue-400 font-medium">
+        Kindle Unlimited
+      </span>
+    );
+  }
+  if (status === false) {
+    return (
+      <span className="text-xs px-2 py-0.5 rounded-full bg-gray-800 text-gray-500">
+        Not on KU
+      </span>
+    );
+  }
+  return (
+    <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-900/30 text-yellow-600">
+      KU status unknown
+    </span>
+  );
+}
+
 function ResearchResultCard({ book, onDone }: { book: Book; onDone: () => void }) {
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState(book.title);
@@ -75,9 +97,7 @@ function ResearchResultCard({ book, onDone }: { book: Book; onDone: () => void }
                 ? `${book.findings.length} source${book.findings.length !== 1 ? 's' : ''} found`
                 : 'No sources found'}
             </span>
-            {book.kindle_unlimited && (
-              <span className="text-xs px-2 py-0.5 rounded-full bg-blue-900/50 text-blue-400 font-medium">KU</span>
-            )}
+            <KUBadge status={book.kindle_unlimited} />
             {book.page_count && <span className="text-xs text-gray-600">{book.page_count}p</span>}
           </div>
         </div>

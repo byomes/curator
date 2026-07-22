@@ -50,7 +50,9 @@ export interface Book {
   spice_notes: string | null;
   cover_image_url: string | null;
   description: string | null;
-  kindle_unlimited: boolean;
+  // Three-state as of 2026-07-22: true (confirmed on KU), false (confirmed
+  // not on KU), null (couldn't verify — e.g. Amazon's bot-block page).
+  kindle_unlimited: boolean | null;
   kindle_unlimited_checked_at: string | null;
   status: BookStatus;
   added_by: number | null;

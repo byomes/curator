@@ -20,6 +20,28 @@ function SourcesBadge({ count }: { count: number }) {
   );
 }
 
+function KUBadge({ status }: { status: boolean | null }) {
+  if (status === true) {
+    return (
+      <span className="shrink-0 text-xs px-2 py-0.5 rounded-full bg-blue-900/50 text-blue-400 font-medium">
+        Kindle Unlimited
+      </span>
+    );
+  }
+  if (status === false) {
+    return (
+      <span className="shrink-0 text-xs px-2 py-0.5 rounded-full bg-gray-800 text-gray-500">
+        Not on KU
+      </span>
+    );
+  }
+  return (
+    <span className="shrink-0 text-xs px-2 py-0.5 rounded-full bg-yellow-900/30 text-yellow-600">
+      KU status unknown
+    </span>
+  );
+}
+
 function BookCard({ book, onDelete }: { book: Book; onDelete: (book: Book) => void }) {
   return (
     <Link
@@ -49,11 +71,7 @@ function BookCard({ book, onDelete }: { book: Book; onDelete: (book: Book) => vo
             </p>
           )}
         </div>
-        {book.kindle_unlimited && (
-          <span className="shrink-0 text-xs px-2 py-0.5 rounded-full bg-blue-900/50 text-blue-400 font-medium">
-            KU
-          </span>
-        )}
+        <KUBadge status={book.kindle_unlimited} />
       </div>
       <div className="mt-3 flex items-center gap-2">
         <SourcesBadge count={book.findings?.length ?? 0} />

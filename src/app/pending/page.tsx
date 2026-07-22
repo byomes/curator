@@ -10,6 +10,28 @@ function Spinner() {
   );
 }
 
+function KUBadge({ status }: { status: boolean | null }) {
+  if (status === true) {
+    return (
+      <span className="text-xs px-2 py-0.5 rounded-full bg-blue-900/50 text-blue-400 font-medium">
+        Kindle Unlimited
+      </span>
+    );
+  }
+  if (status === false) {
+    return (
+      <span className="text-xs px-2 py-0.5 rounded-full bg-gray-800 text-gray-500">
+        Not on KU
+      </span>
+    );
+  }
+  return (
+    <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-900/30 text-yellow-600">
+      KU status unknown
+    </span>
+  );
+}
+
 function PendingCard({ book, onChange }: { book: Book; onChange: () => void }) {
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState(book.title);
@@ -92,12 +114,13 @@ function PendingCard({ book, onChange }: { book: Book; onChange: () => void }) {
             <h3 className="font-medium text-gray-100">{book.title}</h3>
             <p className="text-sm text-gray-500">{book.author}</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="text-xs px-2 py-0.5 rounded-full bg-gray-800 text-gray-300">
               {book.findings && book.findings.length > 0
                 ? `${book.findings.length} source${book.findings.length !== 1 ? 's' : ''} found`
                 : 'No sources found'}
             </span>
+            <KUBadge status={book.kindle_unlimited} />
             <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
               book.status === 'needs_review' ? 'bg-yellow-900/50 text-yellow-400' : 'bg-gray-800 text-gray-400'
             }`}>

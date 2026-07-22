@@ -10,6 +10,28 @@ function Spinner() {
   );
 }
 
+function KUBadge({ status }: { status: boolean | null }) {
+  if (status === true) {
+    return (
+      <span className="text-xs px-2.5 py-1 rounded-full bg-blue-900/50 text-blue-400 font-medium">
+        Kindle Unlimited
+      </span>
+    );
+  }
+  if (status === false) {
+    return (
+      <span className="text-xs px-2.5 py-1 rounded-full bg-gray-800 text-gray-500">
+        Not on KU
+      </span>
+    );
+  }
+  return (
+    <span className="text-xs px-2.5 py-1 rounded-full bg-yellow-900/30 text-yellow-600">
+      KU status unknown
+    </span>
+  );
+}
+
 const SHELF_LABELS: Record<Shelf, string> = {
   want_to_read: 'Want to Read',
   reading: 'Reading',
@@ -130,9 +152,7 @@ export default function BookDetailPage({ params }: { params: Promise<{ id: strin
         >
           {spiceLabel} {book.findings.length > 0 && (showSpiceDetail ? '▲' : '▼')}
         </button>
-        {book.kindle_unlimited && (
-          <span className="text-xs px-2.5 py-1 rounded-full bg-blue-900/50 text-blue-400 font-medium">Kindle Unlimited</span>
-        )}
+        <KUBadge status={book.kindle_unlimited} />
         {book.page_count && (
           <span className="text-xs px-2.5 py-1 rounded-full bg-gray-800 text-gray-400">{book.page_count} pages</span>
         )}
