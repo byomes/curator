@@ -33,13 +33,25 @@ function SpiceBadge({ rating }: { rating: number | null }) {
   );
 }
 
-function BookCard({ book }: { book: Book }) {
+function BookCard({ book, onDelete }: { book: Book; onDelete: (book: Book) => void }) {
   return (
     <Link
       href={`/book/${book.id}`}
-      className="block bg-gray-900 border border-gray-800 rounded-xl p-4 hover:border-gray-700 transition-colors"
+      className="relative block bg-gray-900 border border-gray-800 rounded-xl p-4 hover:border-gray-700 transition-colors"
     >
-      <div className="flex items-start justify-between gap-3">
+      <button
+        type="button"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          onDelete(book);
+        }}
+        aria-label={`Delete ${book.title}`}
+        className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-full text-gray-600 hover:text-red-400 hover:bg-red-900/30 transition-colors leading-none"
+      >
+        ×
+      </button>
+      <div className="flex items-start justify-between gap-3 pr-6">
         <div className="min-w-0">
           <h3 className="font-medium text-gray-100 truncate">{book.title}</h3>
           <p className="text-sm text-gray-500 truncate">{book.author}</p>
@@ -71,6 +83,7 @@ export default function LibraryPage() {
   const [search, setSearch] = useState('');
   const [kuOnly, setKuOnly] = useState(false);
   const [showAll, setShowAll] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -91,6 +104,17 @@ export default function LibraryPage() {
     const timeout = setTimeout(load, 250);
     return () => clearTimeout(timeout);
   }, [load]);
+
+  const handleDelete = useCallback((book: Book) => {
+    if (!window.confirm(`Delete ${book.title}? This can't be undone.`)) return;
+    setDeleteError(null);
+    fetch(`/api/books/${book.id}`, { method: 'DELETE' })
+      .then((res) => {
+        if (!res.ok) throw new Error('delete failed');
+        setBooks((prev) => prev.filter((b) => b.id !== book.id));
+      })
+      .catch(() => setDeleteError(`Failed to delete "${book.title}". Try again.`));
+  }, []);
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-5">
@@ -127,6 +151,19 @@ export default function LibraryPage() {
         )}
       </div>
 
+      {deleteError && (
+        <div className="bg-red-900/20 border border-red-800 rounded-xl p-3 text-red-300 text-sm flex items-center justify-between gap-3">
+          <span>{deleteError}</span>
+          <button
+            type="button"
+            onClick={() => setDeleteError(null)}
+            className="shrink-0 text-red-400 hover:text-red-300"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
       {loading ? (
         <Spinner />
       ) : error ? (
@@ -143,7 +180,7 @@ export default function LibraryPage() {
       ) : (
         <div className="space-y-3">
           {books.map((book) => (
-            <BookCard key={book.id} book={book} />
+            <BookCard key={book.id} book={book} onDelete={handleDelete} />
           ))}
         </div>
       )}
