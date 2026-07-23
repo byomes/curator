@@ -64,6 +64,17 @@ export interface Book {
   // responses, so cards can show real source excerpts instead of a computed
   // rating. Still optional here for defensiveness against older cached data.
   findings?: SpiceFinding[];
+  // Only present when the request carries a session (list_books() attaches this
+  // per the *requesting user's* reading_status row) — null if that user has no
+  // row for this book at all. Not the same shape as ReadingStatusEntry (no
+  // id/book_id/user_id here, just the fields the library filter/badge need).
+  reading_status?: {
+    shelf: Shelf;
+    rating: number | null;
+    date_started: string | null;
+    date_finished: string | null;
+    notes: string | null;
+  } | null;
 }
 
 export interface BookSource {

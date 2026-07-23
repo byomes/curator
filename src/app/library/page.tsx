@@ -20,6 +20,17 @@ function SourcesBadge({ count }: { count: number }) {
   );
 }
 
+type ReadFilter = 'all' | 'unread' | 'read';
+
+// Same segmented-tabs shape as the Add page's mode selector (src/app/page.tsx TABS) --
+// matching the one tabs pattern already established in this app rather than inventing
+// a new one.
+const READ_TABS: { value: ReadFilter; label: string }[] = [
+  { value: 'all', label: 'All' },
+  { value: 'unread', label: 'Unread' },
+  { value: 'read', label: 'Read' },
+];
+
 function KUBadge({ status }: { status: boolean | null }) {
   if (status === true) {
     return (
@@ -87,6 +98,7 @@ export default function LibraryPage() {
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [kuOnly, setKuOnly] = useState(false);
+  const [readFilter, setReadFilter] = useState<ReadFilter>('all');
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const load = useCallback(() => {
@@ -95,6 +107,7 @@ export default function LibraryPage() {
     const params = new URLSearchParams();
     if (search.trim()) params.set('search', search.trim());
     if (kuOnly) params.set('kindle_unlimited', '1');
+    if (readFilter !== 'all') params.set('read', readFilter === 'read' ? 'true' : 'false');
     params.set('show_all', '1');
 
     fetch(`/api/books?${params.toString()}`)
@@ -102,7 +115,7 @@ export default function LibraryPage() {
       .then((data) => setBooks(Array.isArray(data) ? data : []))
       .catch(() => setError('Failed to load books. Check your connection and try again.'))
       .finally(() => setLoading(false));
-  }, [search, kuOnly]);
+  }, [search, kuOnly, readFilter]);
 
   useEffect(() => {
     const timeout = setTimeout(load, 250);
