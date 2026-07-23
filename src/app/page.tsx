@@ -365,7 +365,14 @@ export default function AddPage() {
     }
   }
 
-  const isPolling = jobId !== null && jobStatus?.status !== 'done' && jobStatus?.status !== 'failed';
+  // Stage A/B (curator-spec.md Commit 7): the job reaches 'partial' as soon as Stage A
+  // finishes and the book is already visible (jobStatus.book populated) -- Stage B
+  // (Kindle Unlimited refinement, romance.io finding, full spice_rating) is still
+  // running in the background at that point. Polling (startPolling() above) already
+  // keeps going through 'partial' and only stops at 'done'/'failed', unchanged.
+  const hasBook = jobStatus?.book != null;
+  const isWaitingForFirstResult = jobId !== null && !hasBook && jobStatus?.status !== 'failed';
+  const isEnriching = jobStatus?.status === 'partial';
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-5">
@@ -515,7 +522,7 @@ export default function AddPage() {
 
       {jobId !== null && (
         <div className="space-y-3">
-          {isPolling && (
+          {isWaitingForFirstResult && (
             <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex items-center gap-3">
               <div className="w-5 h-5 border-2 border-gray-700 border-t-blue-500 rounded-full animate-spin shrink-0" />
               <span className="text-sm text-gray-400">Researching… ({elapsed}s)</span>
@@ -528,11 +535,19 @@ export default function AddPage() {
             </div>
           )}
 
-          {jobStatus?.status === 'done' && jobStatus.book && (
-            <ResearchResultCard book={jobStatus.book} onDone={resetForm} />
+          {hasBook && jobStatus?.book && (
+            <>
+              {isEnriching && (
+                <div className="flex items-center gap-2 px-1 text-xs text-gray-500">
+                  <div className="w-3 h-3 border-2 border-gray-700 border-t-blue-500 rounded-full animate-spin shrink-0" />
+                  <span>Kindle Unlimited + full rating still loading…</span>
+                </div>
+              )}
+              <ResearchResultCard book={jobStatus.book} onDone={resetForm} />
+            </>
           )}
 
-          {(jobStatus?.status === 'failed' || jobStatus?.status === 'done') && (
+          {(jobStatus?.status === 'failed' || hasBook) && (
             <button onClick={resetForm} className="text-sm text-gray-500 hover:text-gray-300 underline">
               Add another
             </button>

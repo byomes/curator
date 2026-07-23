@@ -108,7 +108,10 @@ export interface Session {
   name: string;
 }
 
-export type JobStatus = "queued" | "running" | "done" | "failed";
+// "partial" (curator-spec.md Commit 7): Stage A finished and the book is fully
+// visible (same gating rule as always) but Stage B (KU refinement, romance.io
+// finding, full spice_rating judgment) is still running in the background.
+export type JobStatus = "queued" | "running" | "partial" | "done" | "failed";
 
 export interface IngestJobStatus {
   job_id: number;
