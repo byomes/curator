@@ -34,7 +34,7 @@ const READ_TABS: { value: ReadFilter; label: string }[] = [
 function KUBadge({ status }: { status: boolean | null }) {
   if (status === true) {
     return (
-      <span className="shrink-0 text-xs px-2 py-0.5 rounded-full bg-[#d85a30]/20 text-[#d85a30] font-medium">
+      <span className="shrink-0 text-xs px-2 py-0.5 rounded-full bg-[#d85a30] text-white font-medium">
         Kindle Unlimited
       </span>
     );
