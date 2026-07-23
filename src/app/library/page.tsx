@@ -154,6 +154,19 @@ export default function LibraryPage() {
             Kindle Unlimited only
           </label>
         </div>
+        <div className="flex gap-1 bg-gray-900 border border-gray-800 rounded-xl p-1">
+          {READ_TABS.map((tab) => (
+            <button
+              key={tab.value}
+              onClick={() => setReadFilter(tab.value)}
+              className={`flex-1 text-sm px-3 py-2 rounded-lg font-medium transition-colors ${
+                readFilter === tab.value ? 'bg-gray-800 text-gray-100' : 'text-gray-500 hover:text-gray-300'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {deleteError && (
