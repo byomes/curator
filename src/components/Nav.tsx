@@ -2,9 +2,8 @@
 import type { ReactNode } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { BASE_PATH } from '@/lib/base-path';
-import { apiFetch } from '@/lib/api-fetch';
 import { useTheme } from '@/lib/theme';
 
 // Bottom tab bar, deacon-app style (watson-tools/src/app/cat/deaconapp/
@@ -46,15 +45,6 @@ function ListIcon() {
   );
 }
 
-function LogoutIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
-      <path d="M9 21H5a1 1 0 01-1-1V4a1 1 0 011-1h4" />
-      <path d="M16 17l5-5-5-5M21 12H9" />
-    </svg>
-  );
-}
-
 function SunIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
@@ -79,14 +69,7 @@ const TABS: { href: string; label: string; icon: () => ReactNode }[] = [
 ];
 
 export function NavHeader() {
-  const router = useRouter();
   const [theme, toggleTheme] = useTheme();
-
-  async function logout() {
-    await apiFetch('/api/auth/logout', { method: 'POST' });
-    router.push('/login');
-    router.refresh();
-  }
 
   return (
     <div className="shrink-0 bg-white dark:bg-[#0f1117] border-b border-gray-200 dark:border-gray-800 px-4 py-3 flex items-center justify-between">
@@ -94,23 +77,14 @@ export function NavHeader() {
         <Image src={`${BASE_PATH}/icon.png`} alt="" width={22} height={22} className="rounded-md" />
         <span className="font-semibold text-gray-900 dark:text-gray-100 text-sm">Curator</span>
       </div>
-      <div className="flex items-center gap-3">
-        <button
-          type="button"
-          onClick={toggleTheme}
-          aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-          className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
-        >
-          {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
-        </button>
-        <button
-          onClick={logout}
-          aria-label="Log out"
-          className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
-        >
-          <LogoutIcon />
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={toggleTheme}
+        aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+        className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+      >
+        {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+      </button>
     </div>
   );
 }
