@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'Curator',
     short_name: 'Curator',
-    description: 'Book discovery & tracking — spice ratings, Kindle Unlimited, yearly reading stats.',
+    description: 'Book discovery & tracking — spice ratings, Kindle Unlimited.',
     // manifest.ts's own route is basePath-prefixed automatically by Next
     // (same file-convention category as icon.png), but the string values
     // *inside* it are plain JSON the framework doesn't rewrite — same

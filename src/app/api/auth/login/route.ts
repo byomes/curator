@@ -7,15 +7,14 @@ export async function POST(req: NextRequest) {
   const data = await req.json().catch(() => null);
   if (!data) return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
 
-  const name = (data.name ?? '').trim();
-  const password = data.password ?? '';
-  if (!name || !password) {
-    return NextResponse.json({ error: 'Name and password are required.' }, { status: 400 });
+  const pin = (data.pin ?? '').trim();
+  if (!pin) {
+    return NextResponse.json({ error: 'PIN is required.' }, { status: 400 });
   }
 
   const res = await watsonFetch('/api/curator/auth/login', {
     method: 'POST',
-    body: JSON.stringify({ name, password }),
+    body: JSON.stringify({ pin }),
   });
 
   if (res.status === 429) {
@@ -26,11 +25,11 @@ export async function POST(req: NextRequest) {
     );
   }
   if (!res.ok) {
-    return NextResponse.json({ error: 'Invalid name or password.' }, { status: 401 });
+    return NextResponse.json({ error: 'Wrong PIN.' }, { status: 401 });
   }
 
   const user = await res.json().catch(() => null);
-  if (!user) return NextResponse.json({ error: 'Invalid name or password.' }, { status: 401 });
+  if (!user) return NextResponse.json({ error: 'Wrong PIN.' }, { status: 401 });
 
   const cookieValue = await makeSessionCookieValue({ userId: user.userId, name: user.name });
 

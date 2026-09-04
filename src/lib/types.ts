@@ -107,13 +107,6 @@ export interface ReadingStatusEntry {
   page_count?: number | null;
 }
 
-export interface Stats {
-  year: number;
-  count: number;
-  total_pages: number;
-  books: { title: string; author: string; rating: number | null; date_finished: string | null }[];
-}
-
 export interface Session {
   userId: number;
   name: string;
