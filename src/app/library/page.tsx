@@ -9,14 +9,14 @@ import { apiFetch } from '@/lib/api-fetch';
 function Spinner() {
   return (
     <div className="flex items-center justify-center py-24">
-      <div className="w-8 h-8 border-2 border-gray-700 border-t-blue-500 rounded-full animate-spin" />
+      <div className="w-8 h-8 border-2 border-gray-300 dark:border-gray-700 border-t-blue-500 rounded-full animate-spin" />
     </div>
   );
 }
 
 function SourcesBadge({ count }: { count: number }) {
   return (
-    <span className="text-xs px-2 py-0.5 rounded-full bg-gray-800 text-gray-400">
+    <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
       {count > 0 ? `${count} source${count !== 1 ? 's' : ''} found` : 'No sources found'}
     </span>
   );
@@ -43,13 +43,13 @@ function KUBadge({ status }: { status: boolean | null }) {
   }
   if (status === false) {
     return (
-      <span className="shrink-0 text-xs px-2 py-0.5 rounded-full bg-gray-800 text-gray-500">
+      <span className="shrink-0 text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-500">
         Not on KU
       </span>
     );
   }
   return (
-    <span className="shrink-0 text-xs px-2 py-0.5 rounded-full bg-yellow-900/30 text-yellow-600">
+    <span className="shrink-0 text-xs px-2 py-0.5 rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-600">
       KU status unknown
     </span>
   );
@@ -59,7 +59,7 @@ function BookCard({ book, onDelete }: { book: Book; onDelete: (book: Book) => vo
   return (
     <Link
       href={`/book/${book.id}`}
-      className="relative block bg-gray-900 border border-gray-800 rounded-xl p-4 hover:border-gray-700 transition-colors"
+      className="relative block bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4 hover:border-gray-300 dark:hover:border-gray-700 transition-colors"
     >
       <button
         type="button"
@@ -69,16 +69,16 @@ function BookCard({ book, onDelete }: { book: Book; onDelete: (book: Book) => vo
           onDelete(book);
         }}
         aria-label={`Delete ${book.title}`}
-        className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-full text-gray-600 hover:text-red-400 hover:bg-red-900/30 transition-colors leading-none"
+        className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-full text-gray-400 dark:text-gray-600 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors leading-none"
       >
         ×
       </button>
       <div className="flex items-start justify-between gap-3 pr-6">
         <div className="min-w-0">
-          <h3 className="font-medium text-gray-100 truncate">{book.title}</h3>
-          <p className="text-sm text-gray-500 truncate">{book.author}</p>
+          <h3 className="font-medium text-gray-900 dark:text-gray-100 truncate">{book.title}</h3>
+          <p className="text-sm text-gray-500 dark:text-gray-500 truncate">{book.author}</p>
           {book.series && (
-            <p className="text-xs text-gray-600 mt-0.5">
+            <p className="text-xs text-gray-400 dark:text-gray-600 mt-0.5">
               {book.series}
               {book.series_number ? ` #${book.series_number}` : ''}
             </p>
@@ -88,7 +88,7 @@ function BookCard({ book, onDelete }: { book: Book; onDelete: (book: Book) => vo
       </div>
       <div className="mt-3 flex items-center gap-2">
         <SourcesBadge count={book.findings?.length ?? 0} />
-        {book.page_count && <span className="text-xs text-gray-600">{book.page_count}p</span>}
+        {book.page_count && <span className="text-xs text-gray-400 dark:text-gray-600">{book.page_count}p</span>}
       </div>
     </Link>
   );
@@ -143,10 +143,10 @@ export default function LibraryPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search title, author, series…"
-          className="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-2.5 text-gray-100 text-sm focus:outline-none focus:border-blue-600"
+          className="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl px-4 py-2.5 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:border-blue-600"
         />
         <div className="flex items-center gap-4 text-sm">
-          <label className="flex items-center gap-2 text-gray-400">
+          <label className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
             <input
               type="checkbox"
               checked={kuOnly}
@@ -156,13 +156,15 @@ export default function LibraryPage() {
             Kindle Unlimited only
           </label>
         </div>
-        <div className="flex gap-1 bg-gray-900 border border-gray-800 rounded-xl p-1">
+        <div className="flex gap-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-1">
           {READ_TABS.map((tab) => (
             <button
               key={tab.value}
               onClick={() => setReadFilter(tab.value)}
               className={`flex-1 text-sm px-3 py-2 rounded-lg font-medium transition-colors ${
-                readFilter === tab.value ? 'bg-gray-800 text-gray-100' : 'text-gray-500 hover:text-gray-300'
+                readFilter === tab.value
+                  ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100'
+                  : 'text-gray-500 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
               }`}
             >
               {tab.label}
@@ -172,12 +174,12 @@ export default function LibraryPage() {
       </div>
 
       {deleteError && (
-        <div className="bg-red-900/20 border border-red-800 rounded-xl p-3 text-red-300 text-sm flex items-center justify-between gap-3">
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-3 text-red-700 dark:text-red-300 text-sm flex items-center justify-between gap-3">
           <span>{deleteError}</span>
           <button
             type="button"
             onClick={() => setDeleteError(null)}
-            className="shrink-0 text-red-400 hover:text-red-300"
+            className="shrink-0 text-red-600 dark:text-red-400 hover:text-red-500 dark:hover:text-red-300"
           >
             Dismiss
           </button>
@@ -187,12 +189,12 @@ export default function LibraryPage() {
       {loading ? (
         <Spinner />
       ) : error ? (
-        <div className="bg-red-900/20 border border-red-800 rounded-xl p-4 text-red-300 text-sm">{error}</div>
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 text-red-700 dark:text-red-300 text-sm">{error}</div>
       ) : books.length === 0 ? (
         <div className="text-center py-20">
           <Image src={`${BASE_PATH}/icon.png`} alt="Curator" width={64} height={64} className="rounded-xl mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-200 mb-2">No books yet</h2>
-          <p className="text-gray-500 mb-6">Add one, or send Watson a screenshot or link.</p>
+          <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">No books yet</h2>
+          <p className="text-gray-500 dark:text-gray-500 mb-6">Add one, or send Watson a screenshot or link.</p>
           <Link href="/" className="inline-block bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-xl font-medium transition-colors text-base">
             + Add a Book
           </Link>

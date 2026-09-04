@@ -70,8 +70,8 @@ function LoginForm() {
     <div className="max-w-sm mx-auto px-4 py-16">
       <div className="text-center mb-8">
         <Image src={`${BASE_PATH}/icon.png`} alt="Curator" width={56} height={56} className="rounded-xl mx-auto mb-3" />
-        <h1 className="text-xl font-semibold text-gray-100">Curator</h1>
-        <p className="text-sm text-gray-500 mt-1">Enter your PIN</p>
+        <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Curator</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">Enter your PIN</p>
       </div>
 
       <div className="flex justify-center gap-3 mb-6">
@@ -79,14 +79,14 @@ function LoginForm() {
           <div
             key={i}
             className={`h-4 w-4 rounded-full border-2 ${
-              i < pin.length ? 'bg-blue-500 border-blue-500' : 'border-gray-700'
+              i < pin.length ? 'bg-blue-500 border-blue-500' : 'border-gray-300 dark:border-gray-700'
             }`}
           />
         ))}
       </div>
 
       {error && (
-        <p className="text-center text-sm text-red-300 mb-4">{error}</p>
+        <p className="text-center text-sm text-red-600 dark:text-red-300 mb-4">{error}</p>
       )}
 
       <div className="grid grid-cols-3 gap-3">
@@ -99,7 +99,7 @@ function LoginForm() {
               type="button"
               onClick={() => press(key)}
               disabled={loading}
-              className="h-16 rounded-xl bg-gray-900 border border-gray-800 text-gray-100 text-xl font-medium active:scale-95 transition disabled:opacity-50 flex items-center justify-center"
+              className="h-16 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 text-xl font-medium active:scale-95 transition disabled:opacity-50 flex items-center justify-center"
             >
               {key === 'back' ? '⌫' : key}
             </button>

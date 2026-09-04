@@ -6,7 +6,7 @@ import { apiFetch } from '@/lib/api-fetch';
 function Spinner() {
   return (
     <div className="flex items-center justify-center py-24">
-      <div className="w-8 h-8 border-2 border-gray-700 border-t-blue-500 rounded-full animate-spin" />
+      <div className="w-8 h-8 border-2 border-gray-300 dark:border-gray-700 border-t-blue-500 rounded-full animate-spin" />
     </div>
   );
 }
@@ -14,20 +14,20 @@ function Spinner() {
 function KUBadge({ status }: { status: boolean | null }) {
   if (status === true) {
     return (
-      <span className="text-xs px-2 py-0.5 rounded-full bg-blue-900/50 text-blue-400 font-medium">
+      <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-400 font-medium">
         Kindle Unlimited
       </span>
     );
   }
   if (status === false) {
     return (
-      <span className="text-xs px-2 py-0.5 rounded-full bg-gray-800 text-gray-500">
+      <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-500">
         Not on KU
       </span>
     );
   }
   return (
-    <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-900/30 text-yellow-600">
+    <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-600">
       KU status unknown
     </span>
   );
@@ -53,26 +53,26 @@ function PendingCard({ book, onChange }: { book: Book; onChange: () => void }) {
   }
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 space-y-3">
+    <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4 space-y-3">
       {editing ? (
         <div className="space-y-2">
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-gray-100 text-sm"
+            className="w-full bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-gray-100 text-sm"
             placeholder="Title"
           />
           <input
             value={author}
             onChange={(e) => setAuthor(e.target.value)}
-            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-gray-100 text-sm"
+            className="w-full bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-gray-100 text-sm"
             placeholder="Author"
           />
           <div className="flex gap-2">
             <select
               value={spiceRating}
               onChange={(e) => setSpiceRating(e.target.value === '' ? '' : Number(e.target.value))}
-              className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-gray-100 text-sm"
+              className="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-gray-100 text-sm"
             >
               <option value="">Unrated</option>
               {Object.entries(SPICE_SCALE).map(([val, label]) => (
@@ -85,7 +85,7 @@ function PendingCard({ book, onChange }: { book: Book; onChange: () => void }) {
             onChange={(e) => setSpiceNotes(e.target.value)}
             rows={2}
             placeholder="Spice notes"
-            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-gray-100 text-sm"
+            className="w-full bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-gray-100 text-sm"
           />
           <div className="flex gap-2">
             <button
@@ -103,7 +103,7 @@ function PendingCard({ book, onChange }: { book: Book; onChange: () => void }) {
             </button>
             <button
               onClick={() => setEditing(false)}
-              className="text-sm bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-2 rounded-lg font-medium"
+              className="text-sm bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 px-3 py-2 rounded-lg font-medium"
             >
               Cancel
             </button>
@@ -112,30 +112,32 @@ function PendingCard({ book, onChange }: { book: Book; onChange: () => void }) {
       ) : (
         <>
           <div>
-            <h3 className="font-medium text-gray-100">{book.title}</h3>
-            <p className="text-sm text-gray-500">{book.author}</p>
+            <h3 className="font-medium text-gray-900 dark:text-gray-100">{book.title}</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-500">{book.author}</p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs px-2 py-0.5 rounded-full bg-gray-800 text-gray-300">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
               {book.findings && book.findings.length > 0
                 ? `${book.findings.length} source${book.findings.length !== 1 ? 's' : ''} found`
                 : 'No sources found'}
             </span>
             <KUBadge status={book.kindle_unlimited} />
             <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-              book.status === 'needs_review' ? 'bg-yellow-900/50 text-yellow-400' : 'bg-gray-800 text-gray-400'
+              book.status === 'needs_review'
+                ? 'bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-400'
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
             }`}>
               {book.status === 'needs_review' ? 'Needs Review' : 'Pending'}
             </span>
           </div>
           {book.batch_id && book.batch_total && book.batch_total > 1 && (
-            <p className="text-xs text-gray-600">part of a batch of {book.batch_total} submitted today</p>
+            <p className="text-xs text-gray-400 dark:text-gray-600">part of a batch of {book.batch_total} submitted today</p>
           )}
           {book.findings && book.findings.length > 0 && (
             <div className="space-y-2">
               {book.findings.map((f) => (
-                <p key={f.id} className="text-sm text-gray-400 border-l-2 border-gray-700 pl-3">
-                  <span className="font-medium text-gray-300">{f.source_name}:</span> &ldquo;{f.excerpt}&rdquo;
+                <p key={f.id} className="text-sm text-gray-600 dark:text-gray-400 border-l-2 border-gray-300 dark:border-gray-700 pl-3">
+                  <span className="font-medium text-gray-700 dark:text-gray-300">{f.source_name}:</span> &ldquo;{f.excerpt}&rdquo;
                 </p>
               ))}
             </div>
@@ -151,14 +153,14 @@ function PendingCard({ book, onChange }: { book: Book; onChange: () => void }) {
             <button
               disabled={busy}
               onClick={() => setEditing(true)}
-              className="flex-1 text-sm bg-gray-800 hover:bg-gray-700 text-gray-200 px-3 py-2 rounded-lg font-medium disabled:opacity-50"
+              className="flex-1 text-sm bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 px-3 py-2 rounded-lg font-medium disabled:opacity-50"
             >
               ✏️ Edit
             </button>
             <button
               disabled={busy}
               onClick={() => patch({ status: 'rejected' })}
-              className="flex-1 text-sm bg-gray-800 hover:bg-red-900/50 text-gray-400 hover:text-red-400 px-3 py-2 rounded-lg font-medium disabled:opacity-50"
+              className="flex-1 text-sm bg-gray-100 dark:bg-gray-800 hover:bg-red-100 dark:hover:bg-red-900/50 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 px-3 py-2 rounded-lg font-medium disabled:opacity-50"
             >
               🚫 Reject
             </button>
@@ -190,14 +192,14 @@ export default function PendingPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
       <div>
-        <h1 className="text-xl font-semibold text-gray-100">Pending</h1>
-        <p className="text-sm text-gray-500 mt-1">Books Watson found, waiting on approval.</p>
+        <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Pending</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">Books Watson found, waiting on approval.</p>
       </div>
 
       {loading ? (
         <Spinner />
       ) : books.length === 0 ? (
-        <div className="text-center py-20 text-gray-500">
+        <div className="text-center py-20 text-gray-500 dark:text-gray-500">
           <div className="text-5xl mb-4">✨</div>
           Nothing waiting on you right now.
         </div>

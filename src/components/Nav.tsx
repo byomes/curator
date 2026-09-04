@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { BASE_PATH } from '@/lib/base-path';
 import { apiFetch } from '@/lib/api-fetch';
+import { useTheme } from '@/lib/theme';
 
 // Bottom tab bar, deacon-app style (watson-tools/src/app/cat/deaconapp/
 // DeaconAppTabs.tsx) — 3 tabs only, Stats dropped (2026-09-04, at Bill's
@@ -54,14 +55,32 @@ function LogoutIcon() {
   );
 }
 
+function SunIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8l1.8-1.8M18 6l1.8-1.8" />
+    </svg>
+  );
+}
+
+function MoonIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+      <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z" />
+    </svg>
+  );
+}
+
 const TABS: { href: string; label: string; icon: () => ReactNode }[] = [
   { href: '/', label: 'Add', icon: PlusIcon },
   { href: '/pending', label: 'Pending', icon: ClockIcon },
   { href: '/library', label: 'List', icon: ListIcon },
 ];
 
-export function NavHeader({ name }: { name: string }) {
+export function NavHeader() {
   const router = useRouter();
+  const [theme, toggleTheme] = useTheme();
 
   async function logout() {
     await apiFetch('/api/auth/logout', { method: 'POST' });
@@ -70,17 +89,24 @@ export function NavHeader({ name }: { name: string }) {
   }
 
   return (
-    <div className="shrink-0 bg-[#0f1117] border-b border-gray-800 px-4 py-3 flex items-center justify-between">
+    <div className="shrink-0 bg-white dark:bg-[#0f1117] border-b border-gray-200 dark:border-gray-800 px-4 py-3 flex items-center justify-between">
       <div className="flex items-center gap-2">
         <Image src={`${BASE_PATH}/icon.png`} alt="" width={22} height={22} className="rounded-md" />
-        <span className="font-semibold text-gray-100 text-sm">Curator</span>
+        <span className="font-semibold text-gray-900 dark:text-gray-100 text-sm">Curator</span>
       </div>
       <div className="flex items-center gap-3">
-        <span className="text-xs text-gray-500">{name}</span>
+        <button
+          type="button"
+          onClick={toggleTheme}
+          aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+        >
+          {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+        </button>
         <button
           onClick={logout}
           aria-label="Log out"
-          className="text-gray-500 hover:text-gray-300 transition-colors"
+          className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
         >
           <LogoutIcon />
         </button>
@@ -93,7 +119,7 @@ export function NavTabs() {
   const pathname = usePathname();
 
   return (
-    <div className="shrink-0 bg-[#0f1117] border-t border-gray-800 flex pb-[env(safe-area-inset-bottom)]">
+    <div className="shrink-0 bg-white dark:bg-[#0f1117] border-t border-gray-200 dark:border-gray-800 flex pb-[env(safe-area-inset-bottom)]">
       {TABS.map((t) => {
         const Icon = t.icon;
         const active = t.href === '/' ? pathname === '/' : pathname.startsWith(t.href);
@@ -102,7 +128,7 @@ export function NavTabs() {
             key={t.href}
             href={t.href}
             className={`flex-1 flex flex-col items-center justify-center gap-1 py-[14px] transition-colors ${
-              active ? 'text-blue-500' : 'text-gray-500'
+              active ? 'text-blue-600 dark:text-blue-500' : 'text-gray-500 dark:text-gray-500'
             }`}
           >
             <Icon />
