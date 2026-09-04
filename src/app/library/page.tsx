@@ -3,6 +3,8 @@ import { useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Book } from '@/lib/types';
+import { BASE_PATH } from '@/lib/base-path';
+import { apiFetch } from '@/lib/api-fetch';
 
 function Spinner() {
   return (
@@ -110,7 +112,7 @@ export default function LibraryPage() {
     if (readFilter !== 'all') params.set('read', readFilter === 'read' ? 'true' : 'false');
     params.set('show_all', '1');
 
-    fetch(`/api/books?${params.toString()}`)
+    apiFetch(`/api/books?${params.toString()}`)
       .then((res) => res.json())
       .then((data) => setBooks(Array.isArray(data) ? data : []))
       .catch(() => setError('Failed to load books. Check your connection and try again.'))
@@ -125,7 +127,7 @@ export default function LibraryPage() {
   const handleDelete = useCallback((book: Book) => {
     if (!window.confirm(`Delete ${book.title}? This can't be undone.`)) return;
     setDeleteError(null);
-    fetch(`/api/books/${book.id}`, { method: 'DELETE' })
+    apiFetch(`/api/books/${book.id}`, { method: 'DELETE' })
       .then((res) => {
         if (!res.ok) throw new Error('delete failed');
         setBooks((prev) => prev.filter((b) => b.id !== book.id));
@@ -188,7 +190,7 @@ export default function LibraryPage() {
         <div className="bg-red-900/20 border border-red-800 rounded-xl p-4 text-red-300 text-sm">{error}</div>
       ) : books.length === 0 ? (
         <div className="text-center py-20">
-          <Image src="/icon.png" alt="Curator" width={64} height={64} className="rounded-xl mx-auto mb-4" />
+          <Image src={`${BASE_PATH}/icon.png`} alt="Curator" width={64} height={64} className="rounded-xl mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-gray-200 mb-2">No books yet</h2>
           <p className="text-gray-500 mb-6">Add one, or send Watson a screenshot or link.</p>
           <Link href="/" className="inline-block bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-xl font-medium transition-colors text-base">

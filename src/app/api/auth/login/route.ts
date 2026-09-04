@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { watsonFetch } from '@/lib/watson';
 import { makeSessionCookieValue, SESSION_COOKIE, MAX_AGE } from '@/lib/auth';
+import { BASE_PATH } from '@/lib/base-path';
 
 export async function POST(req: NextRequest) {
   const data = await req.json().catch(() => null);
@@ -17,6 +18,13 @@ export async function POST(req: NextRequest) {
     body: JSON.stringify({ name, password }),
   });
 
+  if (res.status === 429) {
+    const body = await res.json().catch(() => null);
+    return NextResponse.json(
+      { error: body?.error ?? 'Too many attempts. Try again later.' },
+      { status: 429 },
+    );
+  }
   if (!res.ok) {
     return NextResponse.json({ error: 'Invalid name or password.' }, { status: 401 });
   }
@@ -30,7 +38,12 @@ export async function POST(req: NextRequest) {
   response.cookies.set(SESSION_COOKIE, cookieValue, {
     httpOnly: true,
     maxAge: MAX_AGE,
-    path: '/',
+    // Scoped to this app's own mount point, not the whole wtsn.me domain —
+    // otherwise this cookie gets sent (harmlessly, but needlessly) on every
+    // request to hamprep/micah-tasks/watson-tools too, since they all share
+    // the domain. Must match logout's delete() path exactly or the browser
+    // won't clear it.
+    path: BASE_PATH,
     sameSite: 'lax',
     secure: process.env.NODE_ENV === 'production',
   });

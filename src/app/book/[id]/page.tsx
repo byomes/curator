@@ -1,6 +1,7 @@
 'use client';
 import { use, useEffect, useState } from 'react';
 import { BookDetail, ReadingStatusEntry, Session, Shelf } from '@/lib/types';
+import { apiFetch } from '@/lib/api-fetch';
 
 function Spinner() {
   return (
@@ -58,13 +59,13 @@ export default function BookDetailPage({ params }: { params: Promise<{ id: strin
 
   useEffect(() => {
     Promise.all([
-      fetch(`/api/books/${id}`).then((r) => r.json()),
-      fetch('/api/auth/me').then((r) => r.json()),
+      apiFetch(`/api/books/${id}`).then((r) => r.json()),
+      apiFetch('/api/auth/me').then((r) => r.json()),
     ]).then(([bookData, sessionData]) => {
       setBook(bookData);
       setSession(sessionData);
       if (sessionData?.userId) {
-        fetch(`/api/reading-status?user=${sessionData.userId}`)
+        apiFetch(`/api/reading-status?user=${sessionData.userId}`)
           .then((r) => r.json())
           .then((entries: ReadingStatusEntry[]) => {
             const found = entries.find((e) => e.book_id === Number(id));
@@ -84,7 +85,7 @@ export default function BookDetailPage({ params }: { params: Promise<{ id: strin
     const body: Record<string, unknown> = { book_id: Number(id), user_id: session.userId, shelf };
     if (shelf === 'reading' && !status?.date_started) body.date_started = new Date().toISOString().slice(0, 10);
     if (shelf === 'read' && !status?.date_finished) body.date_finished = new Date().toISOString().slice(0, 10);
-    const res = await fetch('/api/reading-status', {
+    const res = await apiFetch('/api/reading-status', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -97,7 +98,7 @@ export default function BookDetailPage({ params }: { params: Promise<{ id: strin
   async function saveNotesAndRating() {
     if (!session || !status) return;
     setSaving(true);
-    const res = await fetch('/api/reading-status', {
+    const res = await apiFetch('/api/reading-status', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

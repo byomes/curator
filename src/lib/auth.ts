@@ -2,7 +2,17 @@ const SESSION_COOKIE = 'curator_session';
 const MAX_AGE = 30 * 24 * 60 * 60; // 30 days — low-stakes family app, not re-prompting often
 
 function getSecret(): string {
-  return process.env.CURATOR_SESSION_SECRET ?? 'dev-secret-change-me-in-production';
+  const secret = process.env.CURATOR_SESSION_SECRET;
+  // This repo is public — a hardcoded fallback secret here would be a known,
+  // world-readable session-forging key if the env var were ever unset in
+  // production. Fail loudly instead.
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('CURATOR_SESSION_SECRET must be set in production');
+    }
+    return 'dev-secret-change-me-in-production';
+  }
+  return secret;
 }
 
 async function importHmacKey(secret: string): Promise<CryptoKey> {

@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Book, IngestJobStatus, SPICE_SCALE } from '@/lib/types';
+import { apiFetch } from '@/lib/api-fetch';
 
 type Mode = 'text' | 'image' | 'link' | 'batch';
 
@@ -47,7 +48,7 @@ function ResearchResultCard({ book, onDone }: { book: Book; onDone: () => void }
 
   async function patch(body: Record<string, unknown>) {
     setBusy(true);
-    await fetch(`/api/books/${book.id}`, {
+    await apiFetch(`/api/books/${book.id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -237,7 +238,7 @@ export default function AddPage() {
 
     elapsedRef.current = setInterval(() => setElapsed((e) => e + 1), 1000);
     pollRef.current = setInterval(async () => {
-      const res = await fetch(`/api/ingest/status/${id}`);
+      const res = await apiFetch(`/api/ingest/status/${id}`);
       if (!res.ok) return;
       const data: IngestJobStatus = await res.json();
       setJobStatus(data);
@@ -284,7 +285,7 @@ export default function AddPage() {
               : { title: line.slice(0, idx).trim(), author: line.slice(idx + 4).trim() };
           });
         }
-        const res = await fetch('/api/ingest/batch', {
+        const res = await apiFetch('/api/ingest/batch', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ items }),
@@ -318,14 +319,14 @@ export default function AddPage() {
         if (title.trim()) form.append('title', title.trim());
         if (author.trim()) form.append('author', author.trim());
         if (series.trim()) form.append('series', series.trim());
-        res = await fetch('/api/ingest', { method: 'POST', body: form });
+        res = await apiFetch('/api/ingest', { method: 'POST', body: form });
       } else if (mode === 'link') {
         if (!link.trim()) {
           setError('Paste a link first.');
           setSubmitting(false);
           return;
         }
-        res = await fetch('/api/ingest', {
+        res = await apiFetch('/api/ingest', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ link: link.trim() }),
@@ -336,7 +337,7 @@ export default function AddPage() {
           setSubmitting(false);
           return;
         }
-        res = await fetch('/api/ingest', {
+        res = await apiFetch('/api/ingest', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

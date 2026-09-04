@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { Session, Stats } from '@/lib/types';
+import { apiFetch } from '@/lib/api-fetch';
 
 function Spinner() {
   return (
@@ -17,13 +18,13 @@ export default function StatsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/auth/me').then((r) => r.json()).then(setSession);
+    apiFetch('/api/auth/me').then((r) => r.json()).then(setSession);
   }, []);
 
   useEffect(() => {
     if (!session?.userId) return;
     setLoading(true);
-    fetch(`/api/stats/${session.userId}/${year}`)
+    apiFetch(`/api/stats/${session.userId}/${year}`)
       .then((r) => r.json())
       .then(setStats)
       .finally(() => setLoading(false));

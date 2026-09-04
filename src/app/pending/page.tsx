@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { Book, SPICE_SCALE } from '@/lib/types';
+import { apiFetch } from '@/lib/api-fetch';
 
 function Spinner() {
   return (
@@ -42,7 +43,7 @@ function PendingCard({ book, onChange }: { book: Book; onChange: () => void }) {
 
   async function patch(body: Record<string, unknown>) {
     setBusy(true);
-    await fetch(`/api/books/${book.id}`, {
+    await apiFetch(`/api/books/${book.id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -175,8 +176,8 @@ export default function PendingPage() {
   function load() {
     setLoading(true);
     Promise.all([
-      fetch('/api/books?status=pending&show_all=1').then((r) => r.json()),
-      fetch('/api/books?status=needs_review&show_all=1').then((r) => r.json()),
+      apiFetch('/api/books?status=pending&show_all=1').then((r) => r.json()),
+      apiFetch('/api/books?status=needs_review&show_all=1').then((r) => r.json()),
     ])
       .then(([pending, needsReview]) => {
         setBooks([...(needsReview ?? []), ...(pending ?? [])]);
