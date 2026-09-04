@@ -13,7 +13,17 @@ const TABS: { mode: Mode; label: string }[] = [
   { mode: 'batch', label: 'Batch' },
 ];
 
-const POLL_MS = 2500;
+// Tightened 2026-09-04 from 2500 — pure dead-time before the browser notices
+// a finished search; up to 2.5s of it was eating into the <10s search budget
+// for no reason. NOT tightened all the way to 1000ms: watson-tools' proxy.ts
+// rate-limits at 60 req/min per IP, shared across every tool on wtsn.me —
+// and household members share one IP via NAT, so 1000ms (60/min) alone would
+// consume the *entire* budget for one active poll loop, leaving zero room
+// for anyone else in the house using any wtsn.me tool at the same time
+// (confirmed live: this exact collision happened during testing, though the
+// polling loop degrades gracefully — a failed poll just retries next cycle,
+// no crash). 1500ms leaves real headroom.
+const POLL_MS = 1500;
 
 function KUBadge({ status }: { status: boolean | null }) {
   if (status === true) {
