@@ -1,17 +1,14 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Book, IngestJobStatus, SPICE_SCALE } from '@/lib/types';
 import { apiFetch } from '@/lib/api-fetch';
 
-type Mode = 'text' | 'image' | 'link' | 'batch';
-
-const TABS: { mode: Mode; label: string }[] = [
-  { mode: 'text', label: 'Title / Author' },
-  { mode: 'image', label: 'Cover Photo' },
-  { mode: 'link', label: 'Link' },
-  { mode: 'batch', label: 'Batch' },
-];
+// Cover Photo / Link / Batch modes removed 2026-09-04 (at Bill's request,
+// "for now") — Title/Author is the only add path. Their backend routes
+// (/api/curator/ingest's image/link handling, /api/curator/ingest/batch)
+// are untouched, just unreachable from this UI; re-add the tab selector
+// and the removed form branches/state (file/link/batchText/batchResult) to
+// bring them back rather than rebuilding from scratch.
 
 // Tightened 2026-09-04 from 2500 — pure dead-time before the browser notices
 // a finished search; up to 2.5s of it was eating into the <10s search budget
@@ -209,27 +206,18 @@ function ResearchResultCard({ book, onDone }: { book: Book; onDone: () => void }
 }
 
 export default function AddPage() {
-  const router = useRouter();
-  const [mode, setMode] = useState<Mode>('text');
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
   const [series, setSeries] = useState('');
-  const [link, setLink] = useState('');
-  const [file, setFile] = useState<File | null>(null);
-  const [batchText, setBatchText] = useState('');
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Path A: single-item polling state
   const [jobId, setJobId] = useState<number | null>(null);
   const [jobStatus, setJobStatus] = useState<IngestJobStatus | null>(null);
   const [elapsed, setElapsed] = useState(0);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const elapsedRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  // Path B: batch confirmation
-  const [batchResult, setBatchResult] = useState<{ count: number; message: string } | null>(null);
 
   function resetPolling() {
     if (pollRef.current) clearInterval(pollRef.current);
@@ -262,12 +250,8 @@ export default function AddPage() {
     setTitle('');
     setAuthor('');
     setSeries('');
-    setLink('');
-    setFile(null);
-    setBatchText('');
     setJobId(null);
     setJobStatus(null);
-    setBatchResult(null);
     setError(null);
     resetPolling();
   }
@@ -276,87 +260,22 @@ export default function AddPage() {
     e.preventDefault();
     setError(null);
 
-    if (mode === 'batch') {
-      const lines = batchText.split('\n').map((l) => l.trim()).filter(Boolean);
-      if (lines.length === 0) {
-        setError('Add at least one title, or one link.');
-        return;
-      }
-      setSubmitting(true);
-      try {
-        let items: { title?: string; author?: string; link?: string }[];
-        if (lines.length === 1 && /^https?:\/\//i.test(lines[0])) {
-          items = [{ link: lines[0] }];
-        } else {
-          items = lines.map((line) => {
-            const idx = line.toLowerCase().lastIndexOf(' by ');
-            return idx === -1
-              ? { title: line }
-              : { title: line.slice(0, idx).trim(), author: line.slice(idx + 4).trim() };
-          });
-        }
-        const res = await apiFetch('/api/ingest/batch', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ items }),
-        });
-        const data = await res.json();
-        if (!res.ok) {
-          setError(data.error ?? 'Something went wrong.');
-          return;
-        }
-        setBatchResult({ count: data.count, message: data.message });
-        setBatchText('');
-      } catch {
-        setError('Couldn’t reach Curator. Check your connection and try again.');
-      } finally {
-        setSubmitting(false);
-      }
+    if (!title.trim()) {
+      setError('Title is required.');
       return;
     }
 
     setSubmitting(true);
     try {
-      let res: Response;
-      if (mode === 'image') {
-        if (!file) {
-          setError('Choose a cover photo first.');
-          setSubmitting(false);
-          return;
-        }
-        const form = new FormData();
-        form.append('image', file);
-        if (title.trim()) form.append('title', title.trim());
-        if (author.trim()) form.append('author', author.trim());
-        if (series.trim()) form.append('series', series.trim());
-        res = await apiFetch('/api/ingest', { method: 'POST', body: form });
-      } else if (mode === 'link') {
-        if (!link.trim()) {
-          setError('Paste a link first.');
-          setSubmitting(false);
-          return;
-        }
-        res = await apiFetch('/api/ingest', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ link: link.trim() }),
-        });
-      } else {
-        if (!title.trim()) {
-          setError('Title is required.');
-          setSubmitting(false);
-          return;
-        }
-        res = await apiFetch('/api/ingest', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            title: title.trim(),
-            author: author.trim() || undefined,
-            series: series.trim() || undefined,
-          }),
-        });
-      }
+      const res = await apiFetch('/api/ingest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: title.trim(),
+          author: author.trim() || undefined,
+          series: series.trim() || undefined,
+        }),
+      });
 
       const data = await res.json();
       if (!res.ok) {
@@ -367,8 +286,6 @@ export default function AddPage() {
       setTitle('');
       setAuthor('');
       setSeries('');
-      setLink('');
-      setFile(null);
     } catch {
       setError('Couldn’t reach Curator. Check your connection and try again.');
     } finally {
@@ -392,116 +309,33 @@ export default function AddPage() {
         <p className="text-sm text-gray-500 mt-1">Watson researches spice content and Kindle Unlimited status automatically.</p>
       </div>
 
-      <div className="flex gap-1 bg-gray-900 border border-gray-800 rounded-xl p-1">
-        {TABS.map((tab) => (
-          <button
-            key={tab.mode}
-            onClick={() => { setMode(tab.mode); resetForm(); }}
-            className={`flex-1 text-sm px-3 py-2 rounded-lg font-medium transition-colors ${
-              mode === tab.mode ? 'bg-gray-800 text-gray-100' : 'text-gray-500 hover:text-gray-300'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      {jobId === null && !batchResult && (
+      {jobId === null && (
         <form onSubmit={handleSubmit} className="space-y-4">
-          {mode === 'text' && (
-            <>
-              <div>
-                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5">Title *</label>
-                <input
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 text-gray-100 focus:outline-none focus:border-blue-600"
-                  autoFocus
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5">Author</label>
-                <input
-                  value={author}
-                  onChange={(e) => setAuthor(e.target.value)}
-                  className="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 text-gray-100 focus:outline-none focus:border-blue-600"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5">Series</label>
-                <input
-                  value={series}
-                  onChange={(e) => setSeries(e.target.value)}
-                  className="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 text-gray-100 focus:outline-none focus:border-blue-600"
-                />
-              </div>
-            </>
-          )}
-
-          {mode === 'image' && (
-            <>
-              <div>
-                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5">Cover Photo *</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-                  className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-gray-800 file:text-gray-200 file:text-sm"
-                />
-                <p className="text-xs text-gray-600 mt-1.5">Watson reads the cover automatically — title below is optional if the photo is clear.</p>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5">Title (if known)</label>
-                <input
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 text-gray-100 focus:outline-none focus:border-blue-600"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5">Author (if known)</label>
-                <input
-                  value={author}
-                  onChange={(e) => setAuthor(e.target.value)}
-                  className="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 text-gray-100 focus:outline-none focus:border-blue-600"
-                />
-              </div>
-            </>
-          )}
-
-          {mode === 'link' && (
-            <div>
-              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5">Link *</label>
-              <input
-                type="url"
-                value={link}
-                onChange={(e) => setLink(e.target.value)}
-                placeholder="TikTok, Instagram, YouTube, Goodreads, Amazon…"
-                className="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 text-gray-100 focus:outline-none focus:border-blue-600"
-                autoFocus
-              />
-            </div>
-          )}
-
-          {mode === 'batch' && (
-            <div>
-              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5">
-                Titles (one per line) — or a single link to a book-haul / wrap-up post
-              </label>
-              <textarea
-                value={batchText}
-                onChange={(e) => setBatchText(e.target.value)}
-                rows={8}
-                placeholder={'Fourth Wing by Rebecca Yarros\nThe Hobbit\nBeach Read by Emily Henry\n\n—or—\n\nhttps://tiktok.com/... (a single reel mentioning several books)'}
-                className="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 text-gray-100 focus:outline-none focus:border-blue-600 font-mono text-sm"
-                autoFocus
-              />
-              <p className="text-xs text-gray-600 mt-1.5">
-                If it&rsquo;s a link, paste just that one link by itself — Watson will try to pull out every book it can confidently
-                identify, and email you about anything unclear rather than guess.
-              </p>
-            </div>
-          )}
+          <div>
+            <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5">Title *</label>
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 text-gray-100 focus:outline-none focus:border-blue-600"
+              autoFocus
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5">Author</label>
+            <input
+              value={author}
+              onChange={(e) => setAuthor(e.target.value)}
+              className="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 text-gray-100 focus:outline-none focus:border-blue-600"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5">Series</label>
+            <input
+              value={series}
+              onChange={(e) => setSeries(e.target.value)}
+              className="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 text-gray-100 focus:outline-none focus:border-blue-600"
+            />
+          </div>
 
           {error && (
             <div className="bg-red-900/20 border border-red-800 rounded-xl p-3 text-red-300 text-sm">{error}</div>
@@ -515,20 +349,6 @@ export default function AddPage() {
             {submitting ? 'Submitting…' : 'Submit'}
           </button>
         </form>
-      )}
-
-      {batchResult && (
-        <div className="bg-blue-900/20 border border-blue-800 rounded-xl p-4 text-blue-300 text-sm space-y-3">
-          <p>{batchResult.message}</p>
-          <div className="flex gap-3">
-            <button onClick={resetForm} className="text-blue-400 underline text-sm">
-              Submit another batch
-            </button>
-            <button onClick={() => router.push('/pending')} className="text-blue-400 underline text-sm">
-              Go to Pending →
-            </button>
-          </div>
-        </div>
       )}
 
       {jobId !== null && (
