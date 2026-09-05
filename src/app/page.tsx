@@ -211,6 +211,7 @@ export default function AddPage() {
   const [series, setSeries] = useState('');
 
   const [submitting, setSubmitting] = useState(false);
+  const [photoSubmitting, setPhotoSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [jobId, setJobId] = useState<number | null>(null);
@@ -218,6 +219,7 @@ export default function AddPage() {
   const [elapsed, setElapsed] = useState(0);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const elapsedRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const photoInputRef = useRef<HTMLInputElement | null>(null);
 
   function resetPolling() {
     if (pollRef.current) clearInterval(pollRef.current);
@@ -293,6 +295,31 @@ export default function AddPage() {
     }
   }
 
+  async function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // allow re-selecting the same file for a retry
+    if (!file) return;
+
+    setError(null);
+    setPhotoSubmitting(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const res = await apiFetch('/api/ingest/photo-search', { method: 'POST', body: formData });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error ?? 'Something went wrong.');
+        return;
+      }
+      startPolling(data.job_id);
+    } catch {
+      setError('Couldn’t reach Curator. Check your connection and try again.');
+    } finally {
+      setPhotoSubmitting(false);
+    }
+  }
+
   // Stage A/B (curator-spec.md Commit 7): the job reaches 'partial' as soon as Stage A
   // finishes and the book is already visible (jobStatus.book populated) -- Stage B
   // (Kindle Unlimited refinement, romance.io finding, full spice_rating) is still
@@ -349,6 +376,35 @@ export default function AddPage() {
             {submitting ? 'Submitting…' : 'Submit'}
           </button>
         </form>
+      )}
+
+      {jobId === null && (
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <div className="h-px flex-1 bg-gray-200 dark:bg-gray-800" />
+            <span className="text-xs text-gray-400 dark:text-gray-600 uppercase tracking-wider">or</span>
+            <div className="h-px flex-1 bg-gray-200 dark:bg-gray-800" />
+          </div>
+          <input
+            ref={photoInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            className="hidden"
+            onChange={handlePhotoChange}
+          />
+          <button
+            type="button"
+            disabled={photoSubmitting}
+            onClick={() => photoInputRef.current?.click()}
+            className="w-full bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 active:bg-gray-100 disabled:opacity-50 border border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-300 text-center px-6 py-3.5 rounded-xl font-semibold transition-colors text-base"
+          >
+            {photoSubmitting ? 'Identifying…' : '📷 Search by Photo'}
+          </button>
+          <p className="text-xs text-gray-400 dark:text-gray-600 text-center">
+            Take or upload a photo of the book — Watson will try to identify it.
+          </p>
+        </div>
       )}
 
       {jobId !== null && (
