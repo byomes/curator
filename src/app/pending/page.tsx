@@ -111,25 +111,41 @@ function PendingCard({ book, onChange }: { book: Book; onChange: () => void }) {
         </div>
       ) : (
         <>
-          <div>
-            <h3 className="font-medium text-gray-900 dark:text-gray-100">{book.title}</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-500">{book.author}</p>
+          <div className="flex gap-4">
+            {book.cover_image_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={book.cover_image_url}
+                alt={book.title}
+                className="w-16 h-24 object-cover rounded-lg bg-gray-100 dark:bg-gray-800 shrink-0"
+              />
+            ) : (
+              <div className="w-16 h-24 rounded-lg bg-gray-100 dark:bg-gray-800 shrink-0 flex items-center justify-center text-gray-400 dark:text-gray-600 text-xs text-center px-1">
+                no cover
+              </div>
+            )}
+            <div className="min-w-0 flex-1">
+              <h3 className="font-medium text-gray-900 dark:text-gray-100">{book.title}</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-500">{book.author}</p>
+              <div className="flex items-center gap-2 flex-wrap mt-2">
+                <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+                  {book.findings && book.findings.length > 0
+                    ? `${book.findings.length} source${book.findings.length !== 1 ? 's' : ''} found`
+                    : 'No sources found'}
+                </span>
+                <KUBadge status={book.kindle_unlimited} />
+                {book.page_count && <span className="text-xs text-gray-400 dark:text-gray-600">{book.page_count}p</span>}
+                <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                  book.status === 'needs_review'
+                    ? 'bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-400'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
+                }`}>
+                  {book.status === 'needs_review' ? 'Needs Review' : 'Pending'}
+                </span>
+              </div>
+            </div>
           </div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
-              {book.findings && book.findings.length > 0
-                ? `${book.findings.length} source${book.findings.length !== 1 ? 's' : ''} found`
-                : 'No sources found'}
-            </span>
-            <KUBadge status={book.kindle_unlimited} />
-            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-              book.status === 'needs_review'
-                ? 'bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-400'
-                : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
-            }`}>
-              {book.status === 'needs_review' ? 'Needs Review' : 'Pending'}
-            </span>
-          </div>
+          {book.description && <p className="text-sm text-gray-500 dark:text-gray-500">{book.description}</p>}
           {book.batch_id && book.batch_total && book.batch_total > 1 && (
             <p className="text-xs text-gray-400 dark:text-gray-600">part of a batch of {book.batch_total} submitted today</p>
           )}

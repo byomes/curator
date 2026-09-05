@@ -74,15 +74,27 @@ function BookCard({ book, onDelete }: { book: Book; onDelete: (book: Book) => vo
         ×
       </button>
       <div className="flex items-start justify-between gap-3 pr-6">
-        <div className="min-w-0">
-          <h3 className="font-medium text-gray-900 dark:text-gray-100 truncate">{book.title}</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-500 truncate">{book.author}</p>
-          {book.series && (
-            <p className="text-xs text-gray-400 dark:text-gray-600 mt-0.5">
-              {book.series}
-              {book.series_number ? ` #${book.series_number}` : ''}
-            </p>
+        <div className="flex gap-3 min-w-0">
+          {book.cover_image_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={book.cover_image_url}
+              alt={book.title}
+              className="w-12 h-[4.5rem] object-cover rounded-md bg-gray-100 dark:bg-gray-800 shrink-0"
+            />
+          ) : (
+            <div className="w-12 h-[4.5rem] rounded-md bg-gray-100 dark:bg-gray-800 shrink-0" />
           )}
+          <div className="min-w-0">
+            <h3 className="font-medium text-gray-900 dark:text-gray-100 truncate">{book.title}</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-500 truncate">{book.author}</p>
+            {book.series && (
+              <p className="text-xs text-gray-400 dark:text-gray-600 mt-0.5">
+                {book.series}
+                {book.series_number ? ` #${book.series_number}` : ''}
+              </p>
+            )}
+          </div>
         </div>
         <KUBadge status={book.kindle_unlimited} />
       </div>
@@ -90,6 +102,9 @@ function BookCard({ book, onDelete }: { book: Book; onDelete: (book: Book) => vo
         <SourcesBadge count={book.findings?.length ?? 0} />
         {book.page_count && <span className="text-xs text-gray-400 dark:text-gray-600">{book.page_count}p</span>}
       </div>
+      {book.description && (
+        <p className="mt-2 text-xs text-gray-500 dark:text-gray-500 truncate">{book.description}</p>
+      )}
     </Link>
   );
 }
