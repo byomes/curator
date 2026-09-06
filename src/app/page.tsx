@@ -389,7 +389,6 @@ export default function AddPage() {
             ref={photoInputRef}
             type="file"
             accept="image/*"
-            capture="environment"
             className="hidden"
             onChange={handlePhotoChange}
           />
