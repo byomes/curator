@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 /* Class-based dark mode, same mechanism as watson-tools' deacon app
-   (src/app/globals.css) — the .dark class is applied to a wrapper div by
-   ThemeProvider (src/lib/theme.tsx), not to <html>/<body>, so this variant
-   only affects elements under that wrapper. */
+   (src/app/globals.css) — the .dark class is applied to <html> itself by
+   ThemeProvider (src/lib/theme.tsx), so this variant covers the whole
+   document, not just a wrapped subtree. */
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {

@@ -19,8 +19,8 @@ export default async function RootLayout({
   const session = await getSession(cookieStore.get(SESSION_COOKIE)?.value);
 
   return (
-    <html lang="en" className="h-full antialiased">
-      <body className="h-full">
+    <html lang="en" className="h-full antialiased bg-white dark:bg-[#0f1117]">
+      <body className="h-full bg-white dark:bg-[#0f1117]">
         <ThemeProvider>
           {/* h-dvh + overflow-hidden on the shell, only the middle section
               scrolling — matches the deacon app's shell (its own comment:
