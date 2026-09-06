@@ -154,7 +154,7 @@ export default function BookDetailPage({ params }: { params: Promise<{ id: strin
           {spiceLabel} {book.findings.length > 0 && (showSpiceDetail ? '▲' : '▼')}
         </button>
         <KUBadge status={book.kindle_unlimited} />
-        {book.page_count && (
+        {!!book.page_count && (
           <span className="text-xs px-2.5 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">{book.page_count} pages</span>
         )}
         <span className="text-xs px-2.5 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-500">{book.status}</span>

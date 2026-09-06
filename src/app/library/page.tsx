@@ -100,7 +100,7 @@ function BookCard({ book, onDelete }: { book: Book; onDelete: (book: Book) => vo
       </div>
       <div className="mt-3 flex items-center gap-2">
         <SourcesBadge count={book.findings?.length ?? 0} />
-        {book.page_count && <span className="text-xs text-gray-400 dark:text-gray-600">{book.page_count}p</span>}
+        {!!book.page_count && <span className="text-xs text-gray-400 dark:text-gray-600">{book.page_count}p</span>}
       </div>
       {book.description && (
         <p className="mt-2 text-xs text-gray-500 dark:text-gray-500 truncate">{book.description}</p>

@@ -106,7 +106,7 @@ function ResearchResultCard({ book, onDone }: { book: Book; onDone: () => void }
                 : 'No sources found'}
             </span>
             <KUBadge status={book.kindle_unlimited} />
-            {book.page_count && <span className="text-xs text-gray-400 dark:text-gray-600">{book.page_count}p</span>}
+            {!!book.page_count && <span className="text-xs text-gray-400 dark:text-gray-600">{book.page_count}p</span>}
           </div>
         </div>
       </div>

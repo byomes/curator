@@ -134,7 +134,7 @@ function PendingCard({ book, onChange }: { book: Book; onChange: () => void }) {
                     : 'No sources found'}
                 </span>
                 <KUBadge status={book.kindle_unlimited} />
-                {book.page_count && <span className="text-xs text-gray-400 dark:text-gray-600">{book.page_count}p</span>}
+                {!!book.page_count && <span className="text-xs text-gray-400 dark:text-gray-600">{book.page_count}p</span>}
                 <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                   book.status === 'needs_review'
                     ? 'bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-400'
